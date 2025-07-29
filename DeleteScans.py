@@ -196,6 +196,13 @@ def main():
         buildInfo = ET.fromstring(build_info_XML)
         logprint("Build Info XML: {}".format(build_info_XML))
         logprint("Build Info: {}".format(buildInfo))
+
+        logprint("Build Info has size: {}".format(len(buildInfo)))
+        logprint("Build Info has type: {}".format(type(buildInfo)))
+
+        # logprint("Build Info Published Date: {}".format(type(buildInfo['published_date'])))
+
+
         logprint("Build Info Attribute: {}".format(buildInfo.attrib))
 
         logprint("Build Info Attribute has size: {}".format(len(buildInfo.attrib)))
@@ -210,7 +217,22 @@ def main():
 
         for child in buildInfo:
             logprint("BuildInfo child: {} attribute {}".format(child.tag, child.attrib))
-            # child.tag, child.attrib
+            logprint("BuildInfo child has size: {}".format(len(child)))
+            logprint("BuildInfo child has type: {}".format(type(child)))
+            for grandchild in child:
+                logprint("BuildInfo grandchild: {} attribute {}".format(grandchild.tag, grandchild.attrib))
+                logprint("BuildInfo grandchild attrib has size: {}".format(len(grandchild.attrib)))
+                logprint("BuildInfo grandchild attrib has type: {}".format(type(grandchild.attrib)))
+                logprint("BuildInfo grandchild attrib has keys: {}".format(grandchild.attrib.keys()))
+                analysis_type = grandchild.attrib['analysis_type']
+                published_date = grandchild.attrib['published_date']
+                logprint("--------> We have a scan with published date: {} <------------".format(published_date))
+
+                format_code = '%Y-%m-%dT%H:%M:%S%z'
+                scan_date = datetime.datetime.strptime(published_date, format_code)
+                cutoff_date = datetime.datetime.strptime('2021-09-25', '%Y-%m-%d').astimezone()
+                if analysis_type == 'Dynamic' and scan_date <= cutoff_date:
+                    logprint("--------> We will delete dynamic scan with build ID: {} and published date: {} <------------".format(build_id, published_date))
 
     if dynamic_build_count == 1:
         plural = ''
